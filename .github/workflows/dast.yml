@@ -21,7 +21,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-          // Đoạn này là khởi tạo MySQL và check sức khỏe Server
+          
 
     steps:      
       - name: 1. Tải code từ GitHub về máy ảo        
@@ -29,8 +29,7 @@ jobs:
       
       # 2. Đổ dữ liệu vào MySQL
       - name: 2. Import Database Schema và Mock Data
-        run: |
-        // Đối với web này, CSDL cần được nạp 6 file .sql sau
+        run: 
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/database_schema.sql     // schema để xây dựng DB
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/root_data.sql           // dữ liệu gốc cho DB
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_ff.sql             
@@ -43,10 +42,7 @@ jobs:
       # 3. Sửa đường dẫn Windows thành Linux cho context.xml
       - name: 3. Chỉnh sửa context.xml cho môi trường Linux
         run: sed -i 's|C:/Users/os/Desktop/microshop_uploads|/tmp/microshop_uploads|g' src/main/webapp/META-INF/context.xml
-        // Web này có cái hơi lỏ là nó phải có 1 file 'microshop_uploads' tại desktop thì mới chạy được
-        // Và vì trong Docker file đã tạo sẵn file 'tmp/microshop_uploads'
-        // Chỉ cần thay đổi nội dung đường dẫn trong 'context.xml' về đúng đường dẫn đã tạo 'tmp/microshop_uploads' là được
-        // Xem file content.xml để hiểu rõ hơn
+        
 
       - name: 4. Cài đặt môi trường Java 21        
         uses: actions/setup-java@v4        
