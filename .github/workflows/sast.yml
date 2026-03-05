@@ -1,4 +1,4 @@
-name: SonarCloud SAST
+name: Codacy Security Scan
 
 on:
   push:
@@ -7,28 +7,26 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  codacy-analysis:
     name: Build and Analyze
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
-      - name: Build and SonarCloud Scan
+      - name: Run Codacy Analysis CLI
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
-          mvn clean verify sonar:sonar \
-            -Dsonar.projectKey=microShop \
-            -Dsonar.organization=ngothanhhai-123 \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.sources=src/main/java \
-            -Dsonar.java.binaries=target
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
+            --project-token $CODACY_PROJECT_TOKEN \
+            --force-bundle
