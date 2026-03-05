@@ -24,9 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Run Codacy Analysis CLI
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        run: |
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
-            --project-token $CODACY_PROJECT_TOKEN \
-            --force-bundle
+        uses: codacy/codacy-analysis-cli-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          upload: true
