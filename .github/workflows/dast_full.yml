@@ -85,6 +85,23 @@ jobs:
           name: zap-baseline
           path: previous_scan
 
+      - name: 9. Show Vulnerabilities Summary in Console
+        if: always() # Đảm bảo luôn chạy kể cả khi ZAP scan phát hiện lỗi
+        shell: bash
+        run: |
+          echo "       📊 BẢNG TỔNG HỢP LỖI BẢO MẬT TỪ ZAP 📊       "
+          # Kiểm tra xem file report có được tạo ra không
+          if [ ! -f zap-report.json ]; then
+            echo "❌ Không tìm thấy file zap-report.json. Quá trình scan có thể đã lỗi từ trước."
+            exit 0
+          fi
+
+          echo "Mức độ | Tên lỗ hổng"
+          echo "------------------------------------------------------"
+          
+          # Dùng lệnh jq để bóc tách file JSON, lấy ra Tên lỗi (name) và Mức độ (riskdesc), sau đó gom nhóm lại
+          jq -r '.site[].alerts[]? | "[\(.riskdesc)] \(.name)"' zap-report.json | sort | uniq -c | sort -nr
+
       - name: 10. Evaluate Quality Gate
         shell: bash
         run: |
