@@ -14,8 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+//xinchao
+//hello
 
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = {"/admin/", "/admin/dashboard"})
+@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/", "/admin/dashboard" })
 public class AdminDashboardServlet extends HttpServlet {
 
     private TaiKhoanDAO taiKhoanDAO;
