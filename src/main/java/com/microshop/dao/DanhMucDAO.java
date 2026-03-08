@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// ahihihihihi
 public class DanhMucDAO implements ReadOnlyDAO<DanhMuc, Integer> {
 
     private DanhMuc mapResultSetToDanhMuc(ResultSet rs) throws SQLException {
