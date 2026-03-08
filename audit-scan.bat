@@ -13,8 +13,8 @@ IF NOT EXIST "gitleaks.exe" set MISSING_TOOL=1
 IF NOT EXIST "mvnw.cmd" set MISSING_TOOL=1
 
 IF !MISSING_TOOL! EQU 1 (
-    echo [WARNING] Thieu cong cu GitLeaks hoac Maven. Dang goi setup-env.bat de phuc hoi...
-    call setup-env.bat
+    echo [WARNING] Thieu cong cu GitLeaks hoac Maven. Dang goi setup-env-wlove.bat de phuc hoi...
+    call setup-env-wlove.bat
     :: Sau khi setup xong, kiem tra lai
     IF NOT EXIST "gitleaks.exe" (
         echo [ERROR] Phuc hoi that bai. Khong tim thay Gitleaks.
