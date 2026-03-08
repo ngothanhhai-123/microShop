@@ -1,0 +1,15 @@
+# Bổ sung cấu hình GitLeaks cho dự án microShop
+# File này kế thừa toàn bộ các rules mặc định của GitLeaks
+
+[allowlist]
+description = "Danh sach cac vung an toan se duoc GitLeaks bo qua"
+
+# 1. Bỏ qua các file hoặc thư mục cụ thể (Dùng regex đường dẫn)
+paths = [
+  
+]
+
+# 2. Bỏ qua các chuỗi cụ thể (Ví dụ: Các password giả dùng trong code)
+regexes = [
+    '''GITLEAKS_DUMMY_REGEX_123456789'''
+]

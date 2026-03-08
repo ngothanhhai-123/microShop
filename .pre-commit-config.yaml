@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+        name: Đang chạy công cụ dò quét bí mật GitLeaks
+        verbose: true # Bắt buộc in log ra màn hình dù Passed
+        args:
+          - --verbose
+          - --report-format=json
+          - --report-path=audit-reports/gitleaks-commit.json
+
+
+  - repo: local
+    hooks:
+      - id: maven-pmd-spotbugs
+        name: Đang chạy PMD và SpotBugs (thường khoảng 15-30s, nghỉ mắt chút nhé 👀️)
+#       entry: mvnw.cmd clean compile pmd:check spotbugs:check
+        entry: cmd.exe /c mvnw.cmd clean compile pmd:check spotbugs:check 
+        language: system
+        types: [java]
+        pass_filenames: false
+        verbose: false
+        description: Biên dịch code và quét bằng PMD & SpotBugs.

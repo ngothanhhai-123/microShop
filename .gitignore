@@ -20,3 +20,9 @@ buildNumber.properties
 database/testQuery1.sql
 src/main/java/com/microshop/context/DBContext.java
 
+gitleaks.exe
+audit-reports/gitleaks-audit.json
+audit-reports/gitleaks-commit.json
+audit-reports/maven-audit.log
+audit-reports/pmd.xml
+audit-reports/spotbugs.xml
