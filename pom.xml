@@ -103,6 +103,103 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
             </plugin>
+            
+            <plugin>
+                <!--DevSecOps - PMD-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.21.2</version> 
+                <configuration>
+                    <!--Audit mode: on = set false-->
+                    
+                    <failOnViolation>true</failOnViolation> 
+                    <!--<failOnViolation>false</failOnViolation>--> 
+                    
+                    <failurePriority>2</failurePriority>
+                    <includeTests>false</includeTests>
+                    <printFailingErrors>true</printFailingErrors>
+                    <excludeFromFailureFile>${project.basedir}/exclude/pmd-exclude.properties</excludeFromFailureFile>
+                    
+                    <rulesets>
+                        <ruleset>category/java/security.xml</ruleset>
+                        <ruleset>category/java/errorprone.xml</ruleset>
+                    </rulesets>
+                    <targetDirectory>${project.basedir}/audit-reports</targetDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--DevSecOps - SpotBugs-->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.3.1</version> 
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Medium</threshold> 
+                    
+                    <!--Audit mode: on = set false-->
+                
+                    <failOnError>true</failOnError> 
+                    <!--<failOnError>false</failOnError>--> 
+                    <xmlOutput>true</xmlOutput>
+                    <xmlOutputDirectory>${project.basedir}/audit-reports</xmlOutputDirectory>
+                    
+                    <excludeFilterFile>${project.basedir}/exclude/spotbugs-exclude.xml</excludeFilterFile>
+                    
+                    <plugins>
+                        <plugin>
+                            <groupId>com.h3xstream.findsecbugs</groupId>
+                            <artifactId>findsecbugs-plugin</artifactId>
+                            <version>1.12.0</version>
+                        </plugin>
+                    </plugins>
+                    
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+        
     </build>
+    
+    
+    <profiles>
+        <profile>
+            <id>audit-mode</id> 
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <failOnViolation>false</failOnViolation>
+                            <printFailingErrors>true</printFailingErrors>
+                        </configuration>
+                    </plugin>
+                    
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <threshold>Low</threshold>
+                            <excludeFilterFile>${project.basedir}/exclude/spotbugs-audit-allow-all.xml</excludeFilterFile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

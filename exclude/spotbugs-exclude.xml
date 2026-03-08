@@ -1,4 +1,302 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
 
+    <Match>
+        <Class name="com.microshop.listener.OrderCleanupTask"/>
+        <Or>
+            <Field name="donHangDAO"/>
+            <Field name="donHangSlotSteamDAO"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.model.AnhTaiKhoan"/>
+        <Or>
+            <Method name="&lt;init&gt;"/>
+            <Method name="setDuongDan"/>
+            <Method name="getDuongDan"/>
+        </Or>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.model.TaiKhoan"/>
+        <Or>
+            <Method name="&lt;init&gt;"/>
+            <Method name="setHinhAnh"/>
+            <Method name="getHinhAnh"/>
+        </Or>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.model.GameSteam"/>
+        <Or>
+            <Method name="&lt;init&gt;"/>
+            <Method name="setHinhAnh"/>
+            <Method name="getHinhAnh"/>
+        </Or>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.AdminDashboardServlet"/>
+        <Or>
+            <Field name="donHangDAO"/>
+            <Field name="donHangSlotSteamDAO"/>
+            <Field name="nguoiDungDAO"/>
+            <Field name="taiKhoanDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Or>
+            <Field name="anhTaiKhoanDAO"/>
+            <Field name="danhMucDAO"/>
+            <Field name="freeFireDAO"/>
+            <Field name="lienQuanDAO"/>
+            <Field name="riotDAO"/>
+            <Field name="taiKhoanDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Field name="EXTERNAL_UPLOAD_PATH"/>
+        <Bug pattern="SS_SHOULD_BE_STATIC" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="init"/>
+        <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="deleteFile"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="saveFile"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="saveGameAccount"/>
+        <Bug pattern="REC_CATCH_EXCEPTION, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="doPost"/>
+        <Bug pattern="SF_SWITCH_NO_DEFAULT, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminGameAccountServlet"/>
+        <Method name="doGet"/>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.AdminOrderServlet"/>
+        <Or>
+            <Field name="donHangDAO"/>
+            <Field name="donHangSlotSteamDAO"/>
+            <Field name="nguoiDungDAO"/>
+            <Field name="taiKhoanDAO"/>
+            <Field name="taiKhoanSteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Or>
+            <Field name="baiVietDAO"/>
+            <Field name="gameSteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Field name="EXTERNAL_UPLOAD_PATH"/>
+        <Bug pattern="SS_SHOULD_BE_STATIC" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Method name="deleteFile"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Method name="saveFile"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Method name="saveSteamGame"/>
+        <Bug pattern="REC_CATCH_EXCEPTION, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Method name="doPost"/>
+        <Bug pattern="SF_SWITCH_NO_DEFAULT, PATH_TRAVERSAL_IN" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.AdminSteamGameServlet"/>
+        <Method name="doGet"/>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.HomeServlet"/>
+        <Or>
+            <Field name="gameSteamDAO"/>
+            <Field name="taiKhoanFreeFireDAO"/>
+            <Field name="taiKhoanLienQuanDAO"/>
+            <Field name="taiKhoanRiotDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.LoginServlet"/>
+        <Field name="nguoiDungDAO"/>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.RegisterServlet"/>
+        <Field name="nguoiDungDAO"/>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.ProfileEditServlet"/>
+        <Field name="nguoiDungDAO"/>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.OrderHistoryServlet"/>
+        <Or>
+            <Field name="donHangDAO"/>
+            <Field name="donHangSlotSteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.PaymentExecuteServlet"/>
+        <Or>
+            <Field name="donhangDAO"/>
+            <Field name="donhangsteamDAO"/>
+            <Field name="freeFireDAO"/>
+            <Field name="gamesteamDAO"/>
+            <Field name="gametksteamDAO"/>
+            <Field name="hangDao"/>
+            <Field name="lienQuanDAO"/>
+            <Field name="nguoiDungDAO"/>
+            <Field name="riotDAO"/>
+            <Field name="taiKhoanDAO"/>
+            <Field name="tksteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.PaymentExecuteServlet"/>
+        <Field name="NGUONG_HUY_PHUT"/>
+        <Bug pattern="SS_SHOULD_BE_STATIC" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.PaymentInitiateServlet"/>
+        <Or>
+            <Field name="donhangDAO"/>
+            <Field name="donhangslotsteamDAO"/>
+            <Field name="gametksteamDAO"/>
+            <Field name="taikhoanDAO"/>
+            <Field name="taikhoansteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.PaymentInitiateServlet"/>
+        <Field name="NGUONG_HUY_PHUT"/>
+        <Bug pattern="SS_SHOULD_BE_STATIC" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.PaymentSuccessServlet"/>
+        <Or>
+            <Field name="donHangDAO"/>
+            <Field name="donHangSlotSteamDAO"/>
+            <Field name="nguoidungDAO"/>
+            <Field name="taiKhoanDAO"/>
+            <Field name="taiKhoanSteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.PaymentSuccessServlet"/>
+        <Method name="doPost"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.ProfileServlet"/>
+        <Or>
+            <Field name="hangDao"/>
+            <Field name="nguoiDungDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.SteamGameServlet"/>
+        <Or>
+            <Field name="baiVietDAO"/>
+            <Field name="gameSteamDAO"/>
+            <Field name="gameTkSteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.TaiKhoanGameServlet"/>
+        <Or>
+            <Field name="anhDAO"/>
+            <Field name="freeFireDAO"/>
+            <Field name="lienQuanDAO"/>
+            <Field name="riotDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.controller.TaiKhoanGameServlet"/>
+        <Method name="handleList"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH" />
+    </Match>
+
+    <Match>
+        <Class name="com.microshop.controller.ViewPurchasedAccountServlet"/>
+        <Or>
+            <Field name="donhangDAO"/>
+            <Field name="donhangslotsteamDAO"/>
+            <Field name="gamesteamDAO"/>
+            <Field name="taikhoanDAO"/>
+            <Field name="taikhoansteamDAO"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.microshop.context.DBContext"/>
+        <Bug pattern="HARD_CODE_PASSWORD"/>
+    </Match>
+    <Match>
+        <Class name="com.microshop.context.DongConnectionPool"/>
+        <Method name="contextInitialized"/>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+    </Match>
+
 </FindBugsFilter>
