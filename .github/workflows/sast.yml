@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main", "master", "dev_hai" ]
   pull_request:
-    branches: [ "main", "master", "dev_hai" ] # Đã bổ sung dev_hai vào đây
+    branches: [ "main", "master", "dev_hai" ]
 
 jobs:
   codacy-analysis:
@@ -28,4 +28,9 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           upload: true
-          max-allowed-issues: 2147483647 # Thêm dòng này để Action luôn báo Tick Xanh
+          
+          # YÊU CẦU 1: Giới hạn vùng quét (Chỉ quét source code, bỏ qua database, target, config...)
+          directory: src 
+          
+          # YÊU CẦU 2 & 3: Đẩy Full log (Audit) và nhường quyền Enforce cho Server
+          max-allowed-issues: 2147483647
