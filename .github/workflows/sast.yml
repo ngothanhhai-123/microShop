@@ -30,7 +30,7 @@ jobs:
           upload: true
           
           # YÊU CẦU 1: Giới hạn vùng quét (Chỉ quét source code, bỏ qua database, target, config...)
-          directory: src 
+          directory: ${{ github.workspace }}/src
           
           # YÊU CẦU 2 & 3: Đẩy Full log (Audit) và nhường quyền Enforce cho Server
           max-allowed-issues: 2147483647
