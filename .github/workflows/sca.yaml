@@ -1,0 +1,41 @@
+name: SCA - OWASP Dependency Check
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build project
+      - name: Build project
+        run: mvn -B clean package -DskipTests
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'microShop'
+          path: '.'
+          format: 'HTML'
+          out: 'reports'
+          args: >
+            --failOnCVSS 11
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
+            --enableExperimental
+            --enableRetired
+            --scan target
+            --format HTML
+            --format JSON
+            --format XML
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Dependency-Check-Report
+          path: reports/

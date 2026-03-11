@@ -5,7 +5,7 @@ import java.sql.SQLException;
 //ok
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
+//hungbucu
 public class DBContext {
     
     // jdbc:mysql - định dạng kết nối JDBC cho MySQL
