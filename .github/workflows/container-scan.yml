@@ -30,7 +30,6 @@ jobs:
         run: |
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
-      # Scan nhưng không làm fail pipeline
       - name: Trivy scan (table -> file)
         continue-on-error: true
         uses: aquasecurity/trivy-action@0.33.1
@@ -40,7 +39,7 @@ jobs:
           vuln-type: os,library
           format: table
           output: trivy-image-table.txt
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Print table to console
@@ -58,7 +57,6 @@ jobs:
           output: trivy-image-report.json
           exit-code: 0
           hide-progress: true
-          skip-setup-trivy: true
 
       - name: Upload Trivy artifacts
         uses: actions/upload-artifact@v4
@@ -68,7 +66,6 @@ jobs:
             trivy-image-table.txt
             trivy-image-report.json
 
-      # Quality Gate - fail nếu có HIGH/CRITICAL
       - name: Quality gate (fail on severity if fixable)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.enforce_gate == 'true' }}
         uses: aquasecurity/trivy-action@0.33.1
@@ -81,4 +78,3 @@ jobs:
           ignore-unfixed: true
           exit-code: 1
           hide-progress: true
-          skip-setup-trivy: true
