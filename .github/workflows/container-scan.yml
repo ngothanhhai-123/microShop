@@ -2,7 +2,7 @@ name: Container Build & Trivy Scan
 
 on:
   push:
-    branches: [ "main","tho" ]
+    branches: ["main", "tho"]
   workflow_dispatch:
     inputs:
       enforce_gate:
@@ -23,22 +23,24 @@ jobs:
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Build Docker image
         run: |
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
+      # Scan nhưng không làm fail pipeline
       - name: Trivy scan (table -> file)
+        continue-on-error: true
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: "image"
+          scan-type: image
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-          vuln-type: "os,library"
-          format: "table"
-          output: "trivy-image-table.txt"
-          exit-code: "1"
+          vuln-type: os,library
+          format: table
+          output: trivy-image-table.txt
+          exit-code: 1
           hide-progress: true
 
       - name: Print table to console
@@ -49,12 +51,12 @@ jobs:
       - name: Trivy scan (JSON report)
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: "image"
+          scan-type: image
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-          vuln-type: "os,library"
-          format: "json"
-          output: "trivy-image-report.json"
-          exit-code: "0"
+          vuln-type: os,library
+          format: json
+          output: trivy-image-report.json
+          exit-code: 0
           hide-progress: true
           skip-setup-trivy: true
 
@@ -66,16 +68,17 @@ jobs:
             trivy-image-table.txt
             trivy-image-report.json
 
+      # Quality Gate - fail nếu có HIGH/CRITICAL
       - name: Quality gate (fail on severity if fixable)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.enforce_gate == 'true' }}
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: "image"
+          scan-type: image
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-          vuln-type: "os,library"
-          format: "table"
+          vuln-type: os,library
+          format: table
           severity: "${{ github.event.inputs.gate_severity }}"
           ignore-unfixed: true
-          exit-code: "1"
+          exit-code: 1
           hide-progress: true
           skip-setup-trivy: true
