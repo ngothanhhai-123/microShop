@@ -24,7 +24,7 @@ jobs:
           format: 'HTML'
           out: 'reports'
           args: >
-            --failOnCVSS 11
+            --failOnCVSS 7.0
             --nvdApiKey ${{ secrets.NVD_API_KEY }}
             --enableExperimental
             --enableRetired
