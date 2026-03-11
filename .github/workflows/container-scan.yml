@@ -39,7 +39,7 @@ jobs:
           vuln-type: os,library
           format: table
           output: trivy-image-table.txt
-          exit-code: 0
+          exit-code: 1
           hide-progress: true
 
       - name: Print table to console
@@ -55,7 +55,7 @@ jobs:
           vuln-type: os,library
           format: json
           output: trivy-image-report.json
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Upload Trivy artifacts
