@@ -1,0 +1,81 @@
+name: Container Build & Trivy Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      enforce_gate:
+        description: "Bật/Tắt quality gate (true = fail nếu có HIGH/CRITICAL fixable)"
+        required: true
+        default: "true"
+      gate_severity:
+        description: "Ngưỡng severity cho quality gate"
+        required: true
+        default: "CRITICAL,HIGH"
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: local/tomcat-web
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      - name: Trivy scan (table -> file)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: "image"
+          image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          vuln-type: "os,library"
+          format: "table"
+          output: "trivy-image-table.txt"
+          exit-code: "0"
+          hide-progress: true
+
+      - name: Print table to console
+        run: |
+          echo "----- Trivy table output -----"
+          cat trivy-image-table.txt || true
+
+      - name: Trivy scan (JSON report)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: "image"
+          image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          vuln-type: "os,library"
+          format: "json"
+          output: "trivy-image-report.json"
+          exit-code: "0"
+          hide-progress: true
+          skip-setup-trivy: true
+
+      - name: Upload Trivy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: |
+            trivy-image-table.txt
+            trivy-image-report.json
+
+      - name: Quality gate (fail on severity if fixable)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.enforce_gate == 'true' }}
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: "image"
+          image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          vuln-type: "os,library"
+          format: "table"
+          severity: "${{ github.event.inputs.gate_severity }}"
+          ignore-unfixed: true
+          exit-code: "1"
+          hide-progress: true
+          skip-setup-trivy: true
