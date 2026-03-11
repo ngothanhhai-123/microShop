@@ -2,7 +2,7 @@ name: Container Build & Trivy Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main","tho" ]
   workflow_dispatch:
     inputs:
       enforce_gate:
