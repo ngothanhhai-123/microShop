@@ -38,7 +38,7 @@ jobs:
           vuln-type: "os,library"
           format: "table"
           output: "trivy-image-table.txt"
-          exit-code: "0"
+          exit-code: "1"
           hide-progress: true
 
       - name: Print table to console
