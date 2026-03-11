@@ -55,7 +55,7 @@ jobs:
           vuln-type: os,library
           format: json
           output: trivy-image-report.json
-          exit-code: 0
+          exit-code: 1
           hide-progress: true
 
       - name: Upload Trivy artifacts
