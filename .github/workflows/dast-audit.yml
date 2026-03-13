@@ -1,0 +1,111 @@
+name: DAST baseline scan - audit mode
+
+on:
+  workflow_dispatch: # Chạy thủ công only
+
+jobs:
+  zap_baseline_audit:
+    runs-on: ubuntu-latest
+    name: quét audit DAST baseline
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: microshop_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: 1. Tải code từ GitHub về máy ảo
+        uses: actions/checkout@v4
+
+      - name: 2. Khởi tạo DB - chạy schema - insert root data - insert mock datas
+        run: |
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/database_schema.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/root_data.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_ff.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_lq.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_riot.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_steam_game.sql
+
+      - name: 3. Chỉnh sửa context.xml cho môi trường Linux
+        run: sed -i 's|C:/Users/os/Desktop/microshop_uploads|/tmp/microshop_uploads|g' src/main/webapp/META-INF/context.xml
+
+      - name: 4. Cài đặt môi trường Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 5. Biên dịch code thành file .war
+        run: mvn clean package -DskipTests
+
+      - name: 6. Đóng gói Docker image
+        run: docker build -t micro-shop-app .
+
+      - name: 7. Khởi chạy ứng dụng
+        run: |
+          docker run -d -p 8080:8080 --name micro-shop-test micro-shop-app
+          sleep 40 
+
+      - name: 8. Phân quyền lại thư mục cho ZAP
+        run: chmod -R 777 $GITHUB_WORKSPACE
+
+      - name: Pull ZAP docker image
+        run: docker pull ghcr.io/zaproxy/zaproxy:stable
+
+      - name: 9. Chạy OWASP ZAP baseline-scan (audit mode)
+        run: |
+          # Cờ -g để generate ra file cấu hình các rule hiện tại
+          docker run --network host \
+          -v $(pwd):/zap/wrk/:rw \
+          ghcr.io/zaproxy/zaproxy:stable \
+          zap-baseline.py \
+          -t http://localhost:8080/ \
+          -J report_json.json \
+          -r report_html.html \
+          -w report_md.md \
+          -g zap-baseline-audit.conf \
+          -a || true
+
+      - name: 10. Thống kê kết quả audit
+        run: |
+          echo "Thống kê audit-scan"
+          
+          if [ ! -f report_json.json ]; then
+            echo "Lỗi: Không tìm thấy báo cáo report_json.json.!"
+            exit 1
+          fi
+          
+          CRITICAL_ALERTS=$(jq '[.site[].alerts[]? | select(.riskcode=="4")] | length' report_json.json || echo "0")
+          HIGH_ALERTS=$(jq '[.site[].alerts[]? | select(.riskcode=="3")] | length' report_json.json || echo "0")
+          MEDIUM_ALERTS=$(jq '[.site[].alerts[]? | select(.riskcode=="2")] | length' report_json.json || echo "0")
+          
+          CRITICAL_ALERTS=${CRITICAL_ALERTS:-0}
+          HIGH_ALERTS=${HIGH_ALERTS:-0}
+          MEDIUM_ALERTS=${MEDIUM_ALERTS:-0}
+          
+          echo "=================================="
+          echo "CRITICAL : $CRITICAL_ALERTS"
+          echo "HIGH     : $HIGH_ALERTS"
+          echo "MEDIUM   : $MEDIUM_ALERTS"
+          echo "=================================="
+
+      - name: 11. Lưu trữ báo cáo audit và file config
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-audit-artifacts
+          path: |
+            report_json.json
+            report_html.html
+            report_md.md
+            zap-baseline-gen.conf
