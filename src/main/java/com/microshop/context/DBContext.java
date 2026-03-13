@@ -8,7 +8,7 @@ import com.zaxxer.hikari.HikariDataSource;
 //ok
 //ok
 // Hello
-
+//lmao
 public class DBContext {
     
     // jdbc:mysql - định dạng kết nối JDBC cho MySQL
