@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
         uses: aquasecurity/trivy-action@master
         with:
-          trivy-version: v0.65.0
+          version: v0.65.0
           scan-type: image
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           vuln-type: os,library
