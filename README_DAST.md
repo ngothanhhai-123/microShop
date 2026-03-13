@@ -1,15 +1,20 @@
 Các bước cần có để thực hiện quá trình kiểm duyệt tự động (DAST) bằng công cụ OWASP-ZAP:
 
-B1: Cài đặt Dockerfile đã được đính kèm (Dockerfile không có đuôi) ngang hàng với các thư mục chính như database, src, target, uploads...
-B2: Nếu muốn sử dụng người dùng phải tạo 1 repo trên github đặt tên trang web mà mọi người sử dụng sau đó cần phải remote về máy.
-B3: Lệnh remote về máy theo cấu trúc sau: git remote add origin https://github.com/user/"tên repo của bạn".
-B4: Tạo 1 thư mục .github\workflows: Sau đó cài 2 file dast.yml và dast_full.yml tại đây.
-B5: Nếu chưa có git thì cần phải cài đặt git sau đó khởi tạo repo cho git(git init).
-B6: Tạo 1 nhánh mới k nên push lên main để dễ dàng chỉnh sửa nếu phát hiện ra lỗ hổng..
-B7: Sau đó các khối lệnh sau để tải lên github để sử dụng ZAP:
-                git branch "tên nhanh bạn vừa tạo"
-                git add .
-                git commit -m "Tên quá trình b muốn đẩy lên"
-                git push -u origin "tên nhánh của bạn"
-B8: Vào phần Actions của repo github bạn sẽ thấy được quy trình hoạt động của OWASP-ZAP.
-
+Bước 1: 
+- Đặt file Dockerfile (không có đuôi mở rộng) tại thư mục gốc của dự án (ngang hàng với các thư mục database, src, target, uploads...).
+- Tạo thư mục .github/workflows/ tại thư mục gốc. Sau đó, đặt 2 file kịch bản dast.yml (quét baseline) và dast_full.yml (quét chuyên sâu) vào trong thư mục này.
+Bước 2: Khởi tạo Git cục bộ (Local Repository)
+- Nếu thư mục dự án của bạn chưa được quản lý bởi Git, hãy mở Terminal tại thư mục đó và chạy lệnh:
+        git init
+Bước 3: Kết nối với GitHub (Remote Repository):
+- Đăng nhập vào GitHub và tạo một Repository mới (đặt tên theo dự án của bạn).
+- Kết nối mã nguồn trên máy tính của bạn với Repo trên GitHub bằng lệnh:
+        git remote add origin https://github.com/ten-tai-khoan-cua-ban/ten-repo.git
+Bước 4: Tạo nhánh làm việc và đẩy mã nguồn (Push Code)
+- Thông thường, để an toàn và dễ kiểm soát lỗi phát sinh, không nên làm việc trên nhánh main -> tạo 1 nhánh mới và đẩy lên theo các lệnh sau:
+        git checkout -b ten_nhanh_cua_ban
+        git add .
+        git commit -m "Cấu hình quy trình quét DAST tự động bằng ZAP"
+        git push -u origin ten_nhanh_cua_ban
+Bước 5: Kiểm tra quá trình hoạt động
+- Sau khi lệnh push thành công, hãy truy cập vào Repository của bạn trên trình duyệt web GitHub. Chuyển sang tab Actions, bạn sẽ thấy các tiến trình (workflows) của OWASP ZAP đang được tự động kích hoạt và chạy kiểm duyệt.
