@@ -30,7 +30,7 @@ jobs:
         run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
       - name: Trivy scan (table -> file)
-        continue-on-error: true
+        continue-on-error: false
         uses: aquasecurity/trivy-action@master
         with:
           version: v0.65.0
@@ -39,7 +39,7 @@ jobs:
           vuln-type: os,library
           format: table
           output: trivy-image-table.txt
-          exit-code: 1
+          exit-code: 0
           hide-progress: true
 
       - name: Print table to console
