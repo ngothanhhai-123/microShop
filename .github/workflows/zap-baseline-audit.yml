@@ -1,10 +1,12 @@
+name: DAST Baseline Scan - Audit Mode
+
 on:
-  workflow_dispatch: # Để chạy thủ công
+  workflow_dispatch: # Chỉ chạy thủ công để rà soát toàn bộ lỗi
 
 jobs:
-  zap_baseline_scan:
+  zap_baseline_audit:
     runs-on: ubuntu-latest
-    name: DAST baseline-scan audit tự động
+    name: Quy trình Audit DAST Tự động
     
     services:
       mysql:
@@ -19,6 +21,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+
     steps:
       - name: 1. Tải code từ GitHub về máy ảo
         uses: actions/checkout@v4
@@ -31,6 +34,7 @@ jobs:
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_lq.sql
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_riot.sql
           mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_steam_game.sql
+
       - name: 3. Chỉnh sửa context.xml cho môi trường Linux
         run: sed -i 's|C:/Users/os/Desktop/microshop_uploads|/tmp/microshop_uploads|g' src/main/webapp/META-INF/context.xml
 
@@ -51,14 +55,16 @@ jobs:
         run: |
           docker run -d -p 8080:8080 --name micro-shop-test micro-shop-app
           sleep 40 
+
       - name: 8. Phân quyền lại thư mục cho ZAP
         run: chmod -R 777 $GITHUB_WORKSPACE
 
       - name: Pull ZAP docker image
         run: docker pull ghcr.io/zaproxy/zaproxy:stable
 
-      - name: 9. Chạy OWASP ZAP baseline-scan
+      - name: 9. Chạy OWASP ZAP baseline-scan (Audit Mode)
         run: |
+          # Thêm cờ -g để generate ra file cấu hình các rule hiện tại
           docker run --network host \
           -v $(pwd):/zap/wrk/:rw \
           ghcr.io/zaproxy/zaproxy:stable \
@@ -67,18 +73,17 @@ jobs:
           -J report_json.json \
           -r report_html.html \
           -w report_md.md \
-          -g zap-baseline-audit.conf
-          -I \
+          -g zap-baseline-gen.conf \
           -a || true
-      - name: 10. Quality Gate - Kiểm tra rủi ro Baseline
+
+      - name: 10. Thống kê kết quả Audit (Không chặn luồng)
         run: |
-          echo "Đánh giá Quality Gate..."
+          echo "Thống kê Audit Gate..."
           
           if [ ! -f report_json.json ]; then
             echo "Lỗi: Không tìm thấy báo cáo report_json.json.!"
             exit 1
           fi
-          
           
           CRITICAL_ALERTS=$(jq '[.site[].alerts[]? | select(.riskcode=="4")] | length' report_json.json || echo "0")
           HIGH_ALERTS=$(jq '[.site[].alerts[]? | select(.riskcode=="3")] | length' report_json.json || echo "0")
@@ -94,15 +99,15 @@ jobs:
           echo "HIGH     : $HIGH_ALERTS"
           echo "MEDIUM   : $MEDIUM_ALERTS"
           echo "=================================="
-          
-         
-      - name: 11. Lưu trữ báo cáo baseline-scan
+          echo "Đây là luồng Audit. Workflow sẽ luôn PASSED."
+
+      - name: 11. Lưu trữ báo cáo Audit và file Config
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: zap-baseline-audit-report
+          name: zap-audit-artifacts
           path: |
             report_json.json
             report_html.html
             report_md.md
-            zap-baseline-audit.conf
+            zap-baseline-gen.conf
