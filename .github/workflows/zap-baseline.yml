@@ -79,7 +79,7 @@ jobs:
           -J report_json.json \
           -r report_html.html \
           -w report_md.md \
-          -c security/zap-baseline.conf \
+          -c security/zap-baseline-audit.conf \
           -I \
           -a 
 

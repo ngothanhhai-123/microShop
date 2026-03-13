@@ -73,7 +73,7 @@ jobs:
           -J report_json.json \
           -r report_html.html \
           -w report_md.md \
-          -g zap-baseline-gen.conf \
+          -g zap-baseline-audit.conf \
           -a || true
 
       - name: 10. Thống kê kết quả Audit (Không chặn luồng)
@@ -110,4 +110,4 @@ jobs:
             report_json.json
             report_html.html
             report_md.md
-            zap-baseline-gen.conf
+            zap-baseline-audit.conf
