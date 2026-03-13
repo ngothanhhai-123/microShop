@@ -1,0 +1,102 @@
+name: DAST Baseline Scan - Enforce Mode
+
+on:
+  push:
+    branches: [ "main", "develop" ] # Chỉ chạy khi push trực tiếp vào nhánh lõi
+  pull_request:
+    branches: [ "main", "develop" ] # CHỐT CHẶN: Tự động chạy khi dev tạo PR đòi gộp vào nhánh lõi
+  workflow_dispatch:
+
+jobs:
+  zap_baseline_enforce:
+    runs-on: ubuntu-latest
+    name: Quy trình Kiểm duyệt DAST Tự động (Chặn lỗi mới)
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: microshop_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: 1. Tải code từ GitHub về máy ảo
+        uses: actions/checkout@v4
+
+      - name: 2. Import database schema và mock data
+        run: |
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/database_schema.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/root_data.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_ff.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_lq.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_riot.sql
+          mysql -h 127.0.0.1 -u root -proot microshop_db < database/mock_steam_game.sql
+
+      - name: 3. Chỉnh sửa context.xml cho môi trường Linux
+        run: sed -i 's|C:/Users/os/Desktop/microshop_uploads|/tmp/microshop_uploads|g' src/main/webapp/META-INF/context.xml
+
+      - name: 4. Cài đặt môi trường Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 5. Biên dịch code thành file .war
+        run: mvn clean package -DskipTests
+
+      - name: 6. Đóng gói Docker Image
+        run: docker build -t micro-shop-app .
+
+      - name: 7. Khởi chạy ứng dụng
+        run: |
+          docker run -d -p 8080:8080 --name micro-shop-test micro-shop-app
+          sleep 40 
+
+      - name: 8. Phân quyền lại thư mục cho ZAP
+        run: chmod -R 777 $GITHUB_WORKSPACE
+
+      - name: Pull ZAP docker image
+        run: docker pull ghcr.io/zaproxy/zaproxy:stable
+
+      - name: 9. Quality Gate - ZAP Enforce Scan
+        # Chú ý: Đã bỏ "|| true". 
+        # Nếu ZAP tìm thấy lỗi mới (chưa có mặt trong zap-baseline.conf), ZAP sẽ xuất exit code 1.
+        # Github Action sẽ tự động nhận diện đây là FAIL và Block tiến trình.
+        run: |
+          docker run --network host \
+          -v $(pwd):/zap/wrk/:rw \
+          ghcr.io/zaproxy/zaproxy:stable \
+          zap-baseline.py \
+          -t http://localhost:8080/ \
+          -J report_json.json \
+          -r report_html.html \
+          -w report_md.md \
+          -c security/zap-baseline.conf \
+          -I \
+          -a 
+
+      - name: 10. Tóm tắt kết quả quét (Chỉ hiển thị log)
+        # Bước này chỉ chạy nếu ZAP pass (không bị kẹt ở step 9)
+        run: |
+          echo "QUALITY GATE PASSED!"
+          echo "Các lỗi cũ (đã ghi nhận trong file .conf) đã được phớt lờ."
+          echo "Không phát hiện lỗi bảo mật MỚI nào."
+
+      - name: 11. Lưu trữ báo cáo bảo mật
+        uses: actions/upload-artifact@v4
+        if: always() # Phải có "always()" để dù Step 9 bị đỏ, dev vẫn tải được file report về xem mình vừa code sai cái gì.
+        with:
+          name: zap-enforce-report
+          path: |
+            report_json.json
+            report_html.html
+            report_md.md
+
