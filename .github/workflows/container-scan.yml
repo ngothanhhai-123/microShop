@@ -79,7 +79,7 @@ jobs:
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           vuln-type: os,library
           format: table
-          severity: high,critical
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1
           hide-progress: true
