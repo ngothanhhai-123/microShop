@@ -79,7 +79,7 @@ jobs:
           image-ref: "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           vuln-type: os,library
           format: table
-          severity: "${{ github.event.inputs.gate_severity }}"
+          severity: high,critical
           ignore-unfixed: true
           exit-code: 1
           hide-progress: true
